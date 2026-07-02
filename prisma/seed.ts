@@ -146,7 +146,7 @@ async function upsertReport(
     update: {
       note: data.note,
       daysInMonth: data.daysInMonth,
-      inactiveDays: data.inactiveDays,
+      inactiveDays: data.inactiveDays.join(","),
     },
     create: {
       clientId,
@@ -154,7 +154,7 @@ async function upsertReport(
       month: data.month,
       note: data.note,
       daysInMonth: data.daysInMonth,
-      inactiveDays: data.inactiveDays,
+      inactiveDays: data.inactiveDays.join(","),
     },
   });
 

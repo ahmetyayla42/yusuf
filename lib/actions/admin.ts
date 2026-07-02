@@ -143,7 +143,10 @@ export async function saveReport(
   const month = parseInt(String(formData.get("month") ?? ""), 10);
   const note = String(formData.get("note") ?? "");
   const daysInMonth = parseInt(String(formData.get("daysInMonth") ?? "30"), 10);
-  const inactiveDays = parseIntList(String(formData.get("inactiveDays") ?? ""));
+  // SQLite/Postgres uyumu için gün listesi "18,19,20" metni olarak saklanır.
+  const inactiveDays = parseIntList(
+    String(formData.get("inactiveDays") ?? "")
+  ).join(",");
 
   if (!clientId) return { error: "Müşteri bulunamadı." };
   if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12)

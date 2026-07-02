@@ -11,11 +11,16 @@ export const SESSION_COOKIE = "km_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 gün
 
 function getSecretKey(): Uint8Array {
-  const secret = process.env.AUTH_SECRET;
+  let secret = process.env.AUTH_SECRET;
+  // Yerel geliştirmede .env zorunlu olmasın: güvenli bir geliştirme yedeği kullan.
+  // Üretimde (NODE_ENV=production) AUTH_SECRET mutlaka tanımlı olmalı.
   if (!secret || secret.length < 16) {
-    throw new Error(
-      "AUTH_SECRET tanımlı değil ya da çok kısa. .env dosyasına en az 32 karakterlik bir değer ekle."
-    );
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "AUTH_SECRET tanımlı değil ya da çok kısa. Ortam değişkenlerine en az 32 karakterlik bir değer ekleyin."
+      );
+    }
+    secret = "yerel-gelistirme-icin-varsayilan-anahtar-degistirilebilir";
   }
   return new TextEncoder().encode(secret);
 }

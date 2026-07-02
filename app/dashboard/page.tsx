@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireClient } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { monthName } from "@/lib/calc";
+import { monthName, parseDaysCsv } from "@/lib/calc";
 import { ReportView, ReportViewData } from "@/components/ReportView";
 import { PrintButton } from "@/components/PrintButton";
 import { Logo } from "@/components/Logo";
@@ -51,7 +51,7 @@ export default async function DashboardPage({
     periodLabel: `${monthName(selected.month)} ${selected.year}`,
     note: selected.note,
     daysInMonth: selected.daysInMonth,
-    inactiveDays: selected.inactiveDays,
+    inactiveDays: parseDaysCsv(selected.inactiveDays),
     campaigns: selected.campaigns.map((c) => ({
       name: c.name,
       channel: c.channel,

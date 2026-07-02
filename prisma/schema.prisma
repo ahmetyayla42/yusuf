@@ -5,9 +5,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Yerelde sıfır kurulumla çalışması için SQLite (dosya tabanlı) veritabanı.
+// Üretim/yayın için PostgreSQL'e geçiş: provider'ı "postgresql" yapıp
+// url = env("DATABASE_URL") olarak değiştirmek yeterli (kod aynı kalır).
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // Ajans yöneticisi (2Kat Medya). Tek kayıt yeterli ama birden fazla da olabilir.
@@ -38,7 +41,7 @@ model MonthlyReport {
   month        Int // 1-12 (6 = Haziran)
   note         String? // Genel değerlendirme / kesinti notu
   daysInMonth  Int        @default(30) // Süreklilik şeridi için ayın gün sayısı
-  inactiveDays Int[]      @default([]) // Yayın OLMAYAN gün numaraları (kesinti)
+  inactiveDays String     @default("") // Yayın OLMAYAN gün numaraları, virgülle: "18,19,20"
   campaigns    Campaign[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt

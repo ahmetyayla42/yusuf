@@ -7,6 +7,7 @@ import {
   formatTL,
   formatNumber,
   monthName,
+  parseDaysCsv,
 } from "@/lib/calc";
 import { EditClientForm } from "./EditClientForm";
 import { ReportForm, ExistingReport } from "./ReportForm";
@@ -36,7 +37,7 @@ export default async function ClientDetailPage({
     month: r.month,
     note: r.note ?? "",
     daysInMonth: r.daysInMonth,
-    inactiveDays: r.inactiveDays,
+    inactiveDays: parseDaysCsv(r.inactiveDays),
     campaigns: r.campaigns.map((c) => ({
       name: c.name,
       channel: c.channel,

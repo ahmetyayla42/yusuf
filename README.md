@@ -6,7 +6,7 @@ kendi kullanıcı adı/şifresiyle girip yalnızca kendi raporlarını görür.
 
 - **Marka:** turuncu `#F7A720` + siyah `#000000`
 - **İletişim:** Yusuf Serdar Yavuz · Meta Uzmanı · 0541 290 07 71
-- **Teknoloji:** Next.js 15 · TypeScript · Tailwind · Prisma · PostgreSQL · Auth (bcrypt + imzalı çerez)
+- **Teknoloji:** Next.js 15 · TypeScript · Tailwind · Prisma · SQLite (yerel) / PostgreSQL (yayın) · Auth (bcrypt + imzalı çerez)
 
 > Ürünün mimari planı için ayrıca [`PLAN.md`](./PLAN.md) dosyasına bakabilirsiniz.
 
@@ -26,53 +26,56 @@ kendi kullanıcı adı/şifresiyle girip yalnızca kendi raporlarını görür.
 
 ## Giriş Bilgileri
 
-- **Ajans (admin):** `/login/admin` → `ADMIN_PASSWORD` olarak belirlediğiniz şifre.
-  (İlk girişte admin hesabı otomatik oluşur.)
-- **Müşteri:** `/login/client` → kullanıcı adı/şifresini admin panelinden siz belirlersiniz.
+`npm run setup` sonrası hazır gelen hesaplar:
 
-Demo veri (`npm run db:seed`) yüklerseniz hazır gelen hesaplar:
-
-| Rol | Bilgiler |
-|-----|----------|
-| Müşteri | `protezsac` / `protez2026` |
-| Müşteri | `erkekguzellik` / `erkek2026` |
+| Rol | Adres | Bilgiler |
+|-----|-------|----------|
+| Ajans (admin) | `/login/admin` | `2katadmin2026` |
+| Müşteri | `/login/client` | `protezsac` / `protez2026` |
+| Müşteri | `/login/client` | `erkekguzellik` / `erkek2026` |
 
 > İlk girişten sonra admin panelindeki **“Ajans Şifresini Değiştir”** ile şifreyi
-> güncelleyebilirsiniz.
+> güncelleyin. Yeni müşterileri ve verilerini admin panelinden siz eklersiniz.
 
 ---
 
-## Yerelde Çalıştırma
+## Yerelde Çalıştırma (kolay yol · ek veritabanı GEREKMEZ)
 
-Gereken: Node.js 18+ ve bir PostgreSQL veritabanı (ücretsiz için
-[Neon](https://neon.tech) önerilir).
+Yerelde **SQLite** (dosya tabanlı veritabanı) kullanılır — ayrı bir veritabanı
+kurmanız veya `.env` doldurmanız gerekmez. Tek gereken: **Node.js 18+**.
 
 ```bash
-# 1) Bağımlılıkları kur
+# 1) Bağımlılıkları kur (bir kez)
 npm install
 
-# 2) Ortam değişkenlerini ayarla
-cp .env.example .env
-#   .env içine DATABASE_URL ve AUTH_SECRET yaz
-#   AUTH_SECRET üretmek için:  openssl rand -base64 32
+# 2) Veritabanını oluştur + demo veriyi yükle (bir kez)
+npm run setup
 
-# 3) Veritabanı tablolarını oluştur
-npm run db:push
-
-# 4) Demo veriyi ve admini yükle
-npm run db:seed
-
-# 5) Geliştirme sunucusunu başlat
+# 3) Uygulamayı başlat
 npm run dev
 # → http://localhost:3000
 ```
 
+Tarayıcıda `http://localhost:3000` açın. Giriş bilgileri aşağıda.
+
+> Veritabanı `prisma/dev.db` dosyasında tutulur (git'e gönderilmez). Sıfırlamak
+> için bu dosyayı silip `npm run setup` komutunu tekrar çalıştırın.
+
 ---
 
-## Vercel + Neon ile Yayına Alma (ücretsiz · terminal GEREKMEZ)
+## İnternette Yayına Alma (müşterilerin erişmesi için)
 
-> Tablolar deploy sırasında **otomatik** oluşur (`vercel-build` içinde `prisma db push`),
-> admin hesabı **ilk girişte otomatik** kurulur. Yani komut satırıyla uğraşmanız gerekmez.
+> **Not:** Yerel sürüm SQLite kullanır (tek makinede, dosya tabanlı). Birden çok
+> müşterinin internetten erişeceği kalıcı bir site için **PostgreSQL**'e geçmek
+> gerekir — bu, `prisma/schema.prisma` içinde tek satırlık bir değişikliktir
+> (`provider = "postgresql"` + `url = env("DATABASE_URL")`). Hazır olduğunuzda bu
+> geçişi yapıp aşağıdaki adımları izleyebilirsiniz.
+
+### Vercel + Neon (ücretsiz · terminal GEREKMEZ)
+
+> Postgres'e geçtikten sonra tablolar deploy sırasında **otomatik** oluşur
+> (`vercel-build` içinde `prisma db push`), admin hesabı **ilk girişte otomatik**
+> kurulur.
 
 **Adım 1 — Veritabanı (Neon):**
 [neon.tech](https://neon.tech) → GitHub ile giriş → “New Project” → verilen

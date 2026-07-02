@@ -58,6 +58,21 @@ export function formatPercent(v: number): string {
   })}`;
 }
 
+/** "18, 19, 20" gibi bir metni [18,19,20] sayı dizisine çevirir. */
+export function parseDaysCsv(v: string | number[] | null | undefined): number[] {
+  if (Array.isArray(v)) return v;
+  if (!v) return [];
+  return v
+    .split(",")
+    .map((s) => parseInt(s.trim(), 10))
+    .filter((n) => Number.isFinite(n) && n > 0);
+}
+
+/** [18,19,20] dizisini "18,19,20" metnine çevirir. */
+export function daysToCsv(days: number[]): string {
+  return days.join(",");
+}
+
 export const MONTHS_TR = [
   "Ocak",
   "Şubat",

@@ -104,17 +104,15 @@ ekleyin, DNS'te verilen CNAME kaydını girin.
 
 ---
 
-## Logoyu Kendi Logonla Değiştirme
+## Logoyu Ekleme
 
-Şu an logo, `components/Logo.tsx` içinde marka renkleriyle çizilen bir “wordmark”tır
-(hem koyu hem açık zeminde temiz durur, ekstra dosya gerektirmez).
+Uygulama otomatik olarak **`public/logo.png`** dosyasını logo olarak kullanır.
+Dosya yoksa marka renkli bir yazı logosuna (yedek) düşer — hiçbir yer bozulmaz.
 
-Kendi PNG logonu kullanmak istersen:
-1. Şeffaf arka planlı PNG'yi `public/logo.png` olarak ekle.
-2. `components/Logo.tsx` içindeki wordmark bloğunu şununla değiştir:
-   ```tsx
-   <img src="/logo.png" alt="2Kat Medya" className="h-10 w-auto" />
-   ```
+Kendi logonu eklemek için (kod bilmeden, GitHub üzerinden):
+1. GitHub'da repo → `public` klasörü → **Add file → Upload files**
+2. Şeffaf arka planlı logonu sürükle, adı **`logo.png`** olsun
+3. **Commit changes** → site otomatik günceller
 
 ---
 

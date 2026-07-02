@@ -24,16 +24,21 @@ kendi kullanıcı adı/şifresiyle girip yalnızca kendi raporlarını görür.
 
 ---
 
-## Demo Giriş Bilgileri (seed sonrası)
+## Giriş Bilgileri
 
-| Rol | Adres | Bilgiler |
-|-----|-------|----------|
-| Ajans (admin) | `/login/admin` | Şifre: `2katadmin2026` |
-| Müşteri | `/login/client` | `protezsac` / `protez2026` |
-| Müşteri | `/login/client` | `erkekguzellik` / `erkek2026` |
+- **Ajans (admin):** `/login/admin` → `ADMIN_PASSWORD` olarak belirlediğiniz şifre.
+  (İlk girişte admin hesabı otomatik oluşur.)
+- **Müşteri:** `/login/client` → kullanıcı adı/şifresini admin panelinden siz belirlersiniz.
+
+Demo veri (`npm run db:seed`) yüklerseniz hazır gelen hesaplar:
+
+| Rol | Bilgiler |
+|-----|----------|
+| Müşteri | `protezsac` / `protez2026` |
+| Müşteri | `erkekguzellik` / `erkek2026` |
 
 > İlk girişten sonra admin panelindeki **“Ajans Şifresini Değiştir”** ile şifreyi
-> mutlaka değiştirin.
+> güncelleyebilirsiniz.
 
 ---
 
@@ -64,26 +69,38 @@ npm run dev
 
 ---
 
-## Vercel + Neon ile Yayına Alma (ücretsiz)
+## Vercel + Neon ile Yayına Alma (ücretsiz · terminal GEREKMEZ)
 
-1. **Neon'da veritabanı aç:** neon.tech → yeni proje → bağlantı adresini (connection
-   string) kopyala.
-2. **Repoyu Vercel'e bağla:** vercel.com → “Add New Project” → bu GitHub reposunu seç.
-3. **Ortam değişkenlerini gir** (Vercel → Project → Settings → Environment Variables):
-   - `DATABASE_URL` = Neon bağlantı adresi
-   - `AUTH_SECRET` = `openssl rand -base64 32` çıktısı
-   - `ADMIN_PASSWORD` = ilk admin şifresi (seed için)
-4. **İlk kurulum (bir kez):** repo yerel klonunda `.env`'i Neon adresiyle doldurup:
-   ```bash
-   npm run db:push   # tabloları Neon'a oluştur
-   npm run db:seed   # admin + demo veriyi yükle
-   ```
-   (Alternatif: Neon SQL editöründen tabloları oluşturup admini panelden ekleyebilirsiniz.)
-5. **Deploy:** Vercel otomatik derler ve yayınlar.
-6. **Kendi alan adın:** Vercel → Domains → `panel.2katmedya.com` ekle, DNS'te verilen
-   CNAME kaydını gir.
+> Tablolar deploy sırasında **otomatik** oluşur (`vercel-build` içinde `prisma db push`),
+> admin hesabı **ilk girişte otomatik** kurulur. Yani komut satırıyla uğraşmanız gerekmez.
+
+**Adım 1 — Veritabanı (Neon):**
+[neon.tech](https://neon.tech) → GitHub ile giriş → “New Project” → verilen
+**Connection String**'i (`postgresql://...`) kopyalayın.
+
+**Adım 2 — Yayınla (Vercel):**
+[vercel.com](https://vercel.com) → GitHub ile giriş → “Add New → Project” → bu repoyu
+seçin. Deploy'a basmadan **Environment Variables**'a şunları girin:
+
+| Değişken | Değer |
+|----------|-------|
+| `DATABASE_URL` | Neon bağlantı adresi |
+| `AUTH_SECRET` | Uzun rastgele bir anahtar (örn. `openssl rand -base64 32`) |
+| `ADMIN_PASSWORD` | Belirlemek istediğiniz ilk ajans şifresi |
+
+**Deploy**'a basın. Bittiğinde site yayında (örn. `proje.vercel.app`).
+
+**Adım 3 — İlk giriş:** `/login/admin` → `ADMIN_PASSWORD` olarak girdiğiniz şifreyle
+girin. Admin hesabı ilk girişte otomatik oluşturulur. Sonra panelden müşterilerinizi
+ekleyin.
+
+**Adım 4 — Kendi alan adınız:** Vercel → Settings → Domains → `panel.2katmedya.com`
+ekleyin, DNS'te verilen CNAME kaydını girin.
 
 **Maliyet:** Vercel Hobby + Neon Free = küçük ölçekte **0 TL**.
+
+> Demo müşteri verisiyle (Protez Saç / Erkek Güzellik Salonu) görmek isterseniz, yerel
+> klonda bir kez `npm run db:seed` çalıştırabilirsiniz — üretimde şart değildir.
 
 ---
 

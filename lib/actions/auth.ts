@@ -14,13 +14,22 @@ export async function loginAdmin(
   const password = String(formData.get("password") ?? "");
   if (!password) return { error: "Şifre gerekli." };
 
-  const admin = await prisma.admin.findFirst();
+  let admin = await prisma.admin.findFirst();
+
+  // İlk kurulum: hiç admin yoksa ilk giriş admini oluşturur.
+  // ADMIN_PASSWORD tanımlıysa girilen şifre ona eşit olmalı; değilse
+  // ilk girişte yazılan şifre admin şifresi olur.
   if (!admin) {
-    return {
-      error:
-        "Henüz admin oluşturulmamış. Kurulum için 'npm run db:seed' çalıştırın.",
-    };
+    const configured = process.env.ADMIN_PASSWORD;
+    if (configured && password !== configured) {
+      return { error: "İlk kurulum şifresi hatalı." };
+    }
+    const passwordHash = await bcrypt.hash(password, 10);
+    admin = await prisma.admin.create({ data: { passwordHash } });
+    await setSession({ role: "admin", id: admin.id, name: "2Kat Medya" });
+    redirect("/admin");
   }
+
   const ok = await bcrypt.compare(password, admin.passwordHash);
   if (!ok) return { error: "Şifre hatalı." };
 

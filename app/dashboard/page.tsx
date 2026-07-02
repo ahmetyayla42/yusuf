@@ -5,6 +5,7 @@ import { monthName, parseDaysCsv } from "@/lib/calc";
 import { ReportView, ReportViewData } from "@/components/ReportView";
 import { PrintButton } from "@/components/PrintButton";
 import { Logo } from "@/components/Logo";
+import { IconCalendar } from "@/components/Icons";
 
 export const dynamic = "force-dynamic";
 
@@ -66,24 +67,46 @@ export default async function DashboardPage({
   return (
     <div className="space-y-6">
       {/* Sadece yazdırmada (PDF) görünen markalı başlık */}
-      <div className="mb-2 hidden items-center justify-between border-b border-black/10 pb-4 print:flex">
-        <Logo size="md" />
-        <div className="text-right text-xs text-brand-gray">
-          <div className="font-semibold text-brand-orange-dark">
-            Yusuf Serdar Yavuz
+      <div className="hidden print:block">
+        <div className="flex items-center justify-between border-b border-black/10 pb-4">
+          <Logo size="md" />
+          <div className="text-right text-xs text-brand-gray">
+            <div className="font-semibold text-brand-orange-dark">
+              Yusuf Serdar Yavuz
+            </div>
+            <div>Meta Uzmanı · 0541 290 07 71</div>
           </div>
-          <div>Meta Uzmanı · 0541 290 07 71</div>
+        </div>
+        <div className="mt-4">
+          <div className="text-[11px] font-bold uppercase tracking-widest text-brand-orange-dark">
+            Reklam Performans Raporu
+          </div>
+          <h1 className="text-2xl font-extrabold text-brand-black">
+            {client.name}
+          </h1>
+          <div className="text-sm text-brand-gray">{data.periodLabel}</div>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-brand-black">{client.name}</h1>
-          <p className="text-sm text-brand-gray">
-            Reklam performans raporu · {data.periodLabel}
-          </p>
+      {/* Hero başlık (ekran) */}
+      <div className="no-print relative overflow-hidden rounded-3xl bg-gradient-to-br from-black via-[#1b1b1b] to-[#2a2012] p-6 text-white shadow-xl sm:p-8">
+        <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-brand-orange/20 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-16 left-1/3 h-40 w-40 rounded-full bg-brand-orange/10 blur-3xl" />
+        <div className="relative flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-orange">
+              Reklam Performans Raporu
+            </div>
+            <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
+              {client.name}
+            </h1>
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm text-white/80">
+              <IconCalendar className="h-4 w-4" />
+              {data.periodLabel}
+            </div>
+          </div>
+          <PrintButton />
         </div>
-        <PrintButton />
       </div>
 
       {/* Ay seçici */}

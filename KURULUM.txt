@@ -1,0 +1,36 @@
+========================================================
+  2Kat Medya · Reklam Analiz Programı
+  Kendi bilgisayarında çalıştırma (kolay yol)
+========================================================
+
+Tek seferlik hazırlık:
+
+1) Node.js kur
+   - https://nodejs.org adresine gir
+   - Büyük yeşil "LTS" butonuna bas, ineni kur (hep "İleri/Next" de)
+
+2) Bu programın kodunu indir
+   - GitHub'da depo sayfasında yeşil "Code" butonu → "Download ZIP"
+   - İnen ZIP'i masaüstüne çıkar (sağ tık → "Ayıkla / Extract")
+
+3) Başlat
+   - WINDOWS: klasördeki  baslat.bat  dosyasına ÇİFT TIKLA
+   - MAC:     klasördeki  baslat.command  dosyasına ÇİFT TIKLA
+     (Mac ilk seferde "açılamıyor" derse: dosyaya SAĞ TIKLA → "Aç" → "Aç")
+
+   İlk açılışta kurulum birkaç dakika sürer (bir kez). Sonra tarayıcıda
+   otomatik olarak açılır:  http://localhost:3000
+
+--------------------------------------------------------
+Giriş bilgileri:
+  Ajans (yönetici):  http://localhost:3000/login/admin
+     Şifre: 2katadmin2026
+  Müşteri örneği:    http://localhost:3000/login/client
+     protezsac / protez2026
+     erkekguzellik / erkek2026
+--------------------------------------------------------
+
+Programı kapatmak: açılan siyah/terminal penceresini kapat.
+Tekrar açmak: yine baslat dosyasına çift tıkla.
+
+Takılırsan: ekran görüntüsü al, yardım iste.

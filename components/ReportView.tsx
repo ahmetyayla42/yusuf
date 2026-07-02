@@ -6,6 +6,9 @@ import {
   formatNumber,
   formatPercent,
   channelLabel,
+  ratePerformance,
+  PERF_CRITERIA,
+  type PerfLevel,
 } from "@/lib/calc";
 import { KpiCard } from "./KpiCard";
 import { ContinuityStrip } from "./ContinuityStrip";
@@ -48,6 +51,39 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 // Kampanya satırında 0 değerleri "—" göster (boş görünmesin).
 const dash = (s: string, zero: boolean) => (zero ? "—" : s);
 
+const PERF_STYLE: Record<PerfLevel, string> = {
+  high: "bg-green-100 text-green-700 ring-green-600/20",
+  mid: "bg-amber-100 text-amber-800 ring-amber-600/20",
+  low: "bg-red-100 text-red-700 ring-red-600/20",
+};
+const PERF_DOT: Record<PerfLevel, string> = {
+  high: "bg-green-500",
+  mid: "bg-amber-500",
+  low: "bg-red-500",
+};
+const PERF_SHORT: Record<PerfLevel, string> = {
+  high: "Yüksek",
+  mid: "Orta",
+  low: "Düşük",
+};
+
+function PerfBadge({
+  level,
+  label,
+}: {
+  level: PerfLevel;
+  label: string;
+}) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${PERF_STYLE[level]}`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${PERF_DOT[level]}`} />
+      {label}
+    </span>
+  );
+}
+
 export function ReportView({
   data,
   showCharts = true,
@@ -65,6 +101,14 @@ export function ReportView({
       channel: c.channel,
     }));
   const extras = data.campaigns.filter((c) => c.extraLabel && c.extraValue);
+
+  // Performans değerlendirmesi (CTR bazlı).
+  const rated = data.campaigns
+    .map((c) => ({ c, r: ratePerformance(c.clicks, c.impressions) }))
+    .filter((x): x is { c: (typeof data.campaigns)[number]; r: NonNullable<typeof x.r> } => x.r !== null);
+  const best = rated
+    .slice()
+    .sort((a, b) => ctr(b.c.clicks, b.c.impressions) - ctr(a.c.clicks, a.c.impressions))[0];
 
   return (
     <div className="space-y-8">
@@ -125,6 +169,60 @@ export function ReportView({
         </div>
       )}
 
+      {/* Performans değerlendirmesi */}
+      {rated.length > 0 && (
+        <div className="space-y-4">
+          <SectionTitle>Performans Değerlendirmesi</SectionTitle>
+          {best && (
+            <div className="flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 p-4">
+              <span className="rounded-lg bg-green-500 px-2 py-1 text-xs font-bold text-white">
+                EN BAŞARILI
+              </span>
+              <span className="text-sm text-brand-ink">
+                <span className="font-bold">{best.c.name}</span> — CTR{" "}
+                {formatPercent(ctr(best.c.clicks, best.c.impressions))} ile
+                dönemin en iyi performansı.
+              </span>
+            </div>
+          )}
+          <div className="grid gap-4 md:grid-cols-2">
+            {rated.map(({ c, r }, i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-card"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="font-semibold text-brand-black">{c.name}</div>
+                  <PerfBadge level={r.level} label={r.label} />
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-brand-gray">
+                  {r.comment}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 border-t border-black/5 pt-3 text-xs text-brand-gray">
+                  <span>
+                    CTR{" "}
+                    <b className="text-brand-black">
+                      {formatPercent(ctr(c.clicks, c.impressions))}
+                    </b>
+                  </span>
+                  <span>
+                    CPC{" "}
+                    <b className="text-brand-black">
+                      {formatTL(cpc(c.spend, c.clicks))}
+                    </b>
+                  </span>
+                  <span>
+                    Tıklama{" "}
+                    <b className="text-brand-black">{formatNumber(c.clicks)}</b>
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-brand-gray">{PERF_CRITERIA}</p>
+        </div>
+      )}
+
       {/* Grafikler */}
       {showCharts && chartData.length > 0 && (
         <div className="space-y-4">
@@ -157,6 +255,7 @@ export function ReportView({
                   <th className="px-5 py-3 text-right">Harcama</th>
                   <th className="px-5 py-3 text-right">CTR</th>
                   <th className="px-5 py-3 text-right">CPC</th>
+                  <th className="px-5 py-3 text-center">Değerlendirme</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,6 +302,16 @@ export function ReportView({
                       <td className="px-5 py-3.5 text-right tabular-nums">
                         {dash(formatTL(cpc(c.spend, c.clicks)), c.clicks === 0)}
                       </td>
+                      <td className="px-5 py-3.5 text-center">
+                        {(() => {
+                          const r = ratePerformance(c.clicks, c.impressions);
+                          return r ? (
+                            <PerfBadge level={r.level} label={PERF_SHORT[r.level]} />
+                          ) : (
+                            <span className="text-brand-gray">—</span>
+                          );
+                        })()}
+                      </td>
                     </tr>
                   );
                 })}
@@ -227,6 +336,7 @@ export function ReportView({
                   <td className="px-5 py-3.5 text-right tabular-nums">
                     {formatTL(t.cpc)}
                   </td>
+                  <td className="px-5 py-3.5" />
                 </tr>
               </tfoot>
             </table>

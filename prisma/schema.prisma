@@ -1,0 +1,62 @@
+// 2Kat Medya · Dijital Dönüşüm ve Reklam Analiz Programı
+// Veritabanı şeması (Prisma + PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Ajans yöneticisi (2Kat Medya). Tek kayıt yeterli ama birden fazla da olabilir.
+model Admin {
+  id           String   @id @default(cuid())
+  username     String   @unique @default("admin")
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+// Müşteri (reklam verilen firma). Kendi kullanıcı adı/şifresiyle giriş yapar.
+model Client {
+  id           String          @id @default(cuid())
+  name         String // Firma adı, örn "Protez Saç"
+  username     String          @unique // Müşteri giriş adı
+  passwordHash String
+  contactNote  String? // İsteğe bağlı not / sektör
+  createdAt    DateTime        @default(now())
+  reports      MonthlyReport[]
+}
+
+// Bir müşteriye ait aylık rapor.
+model MonthlyReport {
+  id           String     @id @default(cuid())
+  client       Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId     String
+  year         Int // 2026
+  month        Int // 1-12 (6 = Haziran)
+  note         String? // Genel değerlendirme / kesinti notu
+  daysInMonth  Int        @default(30) // Süreklilik şeridi için ayın gün sayısı
+  inactiveDays Int[]      @default([]) // Yayın OLMAYAN gün numaraları (kesinti)
+  campaigns    Campaign[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([clientId, year, month])
+}
+
+// Aylık rapor içindeki tek bir kampanya satırı.
+model Campaign {
+  id          String        @id @default(cuid())
+  report      MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reportId    String
+  name        String // "Google Ads – Protez Saç"
+  channel     String // "google" | "meta"
+  clicks      Int           @default(0)
+  impressions Int           @default(0)
+  spend       Float         @default(0) // TL
+  extraLabel  String? // Ek metrik adı, örn "Profil ziyareti"
+  extraValue  Int? // Ek metrik değeri
+  order       Int           @default(0)
+}
